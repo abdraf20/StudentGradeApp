@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Manager</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 200px; }
+        
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-add { background-color: #3498db; color: white; }
+        .btn-calc { background-color: #27ae60; color: white; width: 100%; margin-top: 20px; font-size: 18px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        
+        .stats-box { background: #e8f6f3; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #27ae60; }
+        .fail { color: #e74c3c; font-weight: bold; }
+        .pass { color: #27ae60; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1> Student Grades System</h1>
+
+    <div class="input-group">
+        <input type="text" id="sName" placeholder="Student Name (e.g. Ahmad)">
+        <input type="number" id="sGrade" placeholder="Grade (0-100)">
+        <button class="btn-add" onclick="addStudent()">+ Add Student</button>
+    </div>
+
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Grade</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if students %}
+                {% for s in students %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.grade }}</td>
+                    <td class="{{ 'pass' if s.grade >= 50 else 'fail' }}">
+                        {{ 'Pass' if s.grade >= 50 else 'Fail' }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+
+    <form method="POST" action="/" id="calcForm">
+        <input type="hidden" name="students_data" id="hiddenData">
+        <button type="button" class="btn-calc" onclick="submitData()"> result </button>
+    </form>
+
+    {% if stats %}
+    <div class="stats-box">
+        <h3> Report</h3>
+        <p><strong>Total Students:</strong> {{ stats.count }}</p>
+        <p><strong>Class Average:</strong> {{ stats.average }}%</p>
+        <p><strong>Highest Grade:</strong> {{ stats.max }} ({{ stats.best_student }})</p>
+        <p><strong>Lowest Grade:</strong> {{ stats.min }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    let studentsList = [];
+
+    function addStudent() {
+        const name = document.getElementById('sName').value;
+        const grade = document.getElementById('sGrade').value;
+
+        if(name === "" || grade === "") {
+            alert("Please enter both Name and Grade!");
+            return;
+        }
+
+        const student = { name: name, grade: parseFloat(grade) };
+        studentsList.push(student);
+
+
+        const table = document.getElementById('studentsTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+            <td>${studentsList.length}</td>
+            <td>${name}</td>
+            <td>${grade}</td>
+            <td>-</td>
+        `;
+
+
+        document.getElementById('sName').value = "";
+        document.getElementById('sGrade').value = "";
+    }
+
+   
+    function submitData() {
+        if (studentsList.length === 0) {
+            alert("Add at least one student first!");
+            return;
+        }
+       
+        document.getElementById('hiddenData').value = JSON.stringify(studentsList);
+        document.getElementById('calcForm').submit();
+    }
+</script>
+
+</body>
+</html>
