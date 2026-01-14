@@ -10,17 +10,17 @@ def index():
 
     if request.method == 'POST':
         try:
-            # استلام البيانات النصية من الحقل المخفي
+       
             data_str = request.form.get('students_data')
             if data_str:
-                # تحويل النص إلى قائمة بايثون
+         
                 students = json.loads(data_str)
                 
-                # استخراج العلامات فقط للحسابات
+   
                 grades = [s['grade'] for s in students]
                 
                 if grades:
-                    # العثور على أفضل طالب
+           
                     best_student = max(students, key=lambda x: x['grade'])
 
                     stats = {
